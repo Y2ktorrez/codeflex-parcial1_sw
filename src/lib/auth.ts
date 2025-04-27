@@ -19,8 +19,9 @@ export interface RegisteredUser {
   is_staff: boolean;
   is_superuser: boolean;
   login_ip: string | null;
-  groups: any[];
-  user_permissions: any[];
+  // Ya no usamos `any[]`, sino `unknown[]`
+  groups: unknown[];
+  user_permissions: unknown[];
 }
 
 export const registerUser = async (
@@ -49,6 +50,9 @@ export interface LoginResponse {
 export const loginUser = async (
   data: LoginUserPayload
 ): Promise<LoginResponse> => {
-  const response = await api.post<LoginResponse>("/authentication/login/", data);
+  const response = await api.post<LoginResponse>(
+    "/authentication/login/",
+    data
+  );
   return response.data;
 };

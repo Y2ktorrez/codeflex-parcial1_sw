@@ -1,6 +1,5 @@
 'use client';
-
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getWebSocketService } from "@/service/WebsocketService";
 
@@ -17,7 +16,7 @@ interface WebSocketContextType {
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
-export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
   const { accessToken } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const wsService = getWebSocketService();
@@ -25,41 +24,57 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     const code = localStorage.getItem("current_invitation_code");
     const WS_BASE_URL = process.env.NEXT_PUBLIC_WS;
+   
     if (!code || !accessToken || !WS_BASE_URL) return;
 
+    // Conectar usando el servicio singleton
     const wsUrl = `${WS_BASE_URL}/ws/room/${code}/?token=${accessToken}`;
     wsService.connect(wsUrl);
 
+    // Registrar un manejador de mensajes
     const removeHandler = wsService.addMessageHandler((data) => {
+      console.log("Mensaje recibido en handler:", data); // Para depuración
+      
       if (data.type === "presence" && data.event === "join") {
-        const user =
-          typeof data.user === "string" ? data.user : data.user.username;
         setMessages(prev => [
           ...prev,
-          { type: "system", content: `${user} se ha unido al proyecto`, username: user },
+          { 
+            type: "system", 
+            content: `${typeof data.user === 'string' ? data.user : data.user.username} se ha unido al proyecto`, 
+            username: typeof data.user === 'string' ? data.user : data.user.username 
+          }
         ]);
       } else if (data.type === "chat_message") {
-        const user =
-          typeof data.user === "string" ? data.user : data.user?.username || "Anonimo";
+        console.log("Usuario actual:", localStorage.getItem("current_username"));
+        console.log("Username extraído:", typeof data.user === 'string' ? data.user : data.user?.username);
+        
         setMessages(prev => [
           ...prev,
-          { type: "chat", content: data.content, username: user },
+          { 
+            type: "chat", 
+            content: data.content, 
+            username: typeof data.user === 'string' ? data.user : data.user?.username || "Anonimo" 
+          }
         ]);
       }
     });
 
+    // Limpieza al desmontar
     return () => {
       removeHandler();
-      // not calling wsService.disconnect() here to keep the socket alive
+      // No desconectamos aquí para mantener la conexión viva
+      // Solo se desconectará si la aplicación se cierra o se llama explícitamente a disconnect
     };
-  }, [accessToken, wsService]);
+  }, [accessToken]);
 
   const sendMessage = (msg: string) => {
     const username = localStorage.getItem("current_username") || "Anonimo";
+    console.log("Enviando mensaje como:", username);
+    
     wsService.send({
       type: "chat_message",
       message: msg,
-      user: username,
+      user: username  // Enviar el username directamente, no como objeto
     });
   };
 
