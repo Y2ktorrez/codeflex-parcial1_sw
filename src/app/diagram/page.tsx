@@ -18,7 +18,7 @@ export default function DiagramPage() {
     if (!xmlFile) return;
     setProcessing(true);
     try {
-      await ExportXmlAngular(xmlFile, 'xml-model-angular-project');
+      await ExportXmlAngular(xmlFile, 'diagram');
     } catch (err) {
       console.error(err);
       window.dispatchEvent(
@@ -36,7 +36,7 @@ export default function DiagramPage() {
     <section className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
-          <CardTitle>Generador Angular desde XML</CardTitle>
+          <CardTitle>Angular Generador</CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -56,7 +56,7 @@ export default function DiagramPage() {
             ) : (
               <>
                 <UploadCloud className="w-10 h-10 text-accent mb-2" />
-                <p className="text-sm text-muted-foreground">Arrastra tu XML o haz clic para elegir</p>
+                <p className="text-sm text-muted-foreground">Drag your Diagram or click to choose</p>
               </>
             )}
 
@@ -76,11 +76,11 @@ export default function DiagramPage() {
             disabled={processing || !xmlFile}
             onClick={() => setXmlFile(null)}
           >
-            Limpiar
+            Clear
           </Button>
           <Button disabled={processing || !xmlFile} onClick={handleGenerate}>
             {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {processing ? 'Generando...' : 'Generar proyecto'}
+            {processing ? 'Generando...' : 'Generate'}
           </Button>
         </CardFooter>
       </Card>

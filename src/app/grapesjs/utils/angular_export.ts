@@ -44,13 +44,16 @@ export async function ExportToAngular(editor: Editor, projectName: string="expor
   zip.file(`${projectName}.json`, JSON.stringify(projectWithCode, null, 2));
 
   const scriptContent = `#!/usr/bin/env bun
-/**
- * generate-from-grapes.ts
- * Automatiza la creación de un proyecto Angular v19
- * desde un JSON exportado de GrapesJS.
- * 
- * Para ejecutar: bun run generate-from-grapes.ts
- */
+console.log(\`
+
+░█▀▀░█▀█░█▀▄░█▀▀░█▀▀░█░░░█▀▀░█░█░░░░█▀█░▀█▀
+░█░░░█░█░█░█░█▀▀░█▀▀░█░░░█▀▀░▄▀▄░░░░█▀█░░█░
+░▀▀▀░▀▀▀░▀▀░░▀▀▀░▀░░░▀▀▀░▀▀▀░▀░▀░▀░░▀░▀░▀▀▀
+
+ \`);
+
+console.log('Generating resources, please wait ...');
+
 import { $ } from 'bun';
 import { join, basename } from 'path';
 import { readFileSync, writeFileSync, copyFileSync } from 'fs';
@@ -65,7 +68,6 @@ if (!projectName) {
 }
 
 const appName = \`\${projectName}\`;
-console.log('⚙️  ng new', appName);
 await $\`bun x @angular/cli@19 new \${appName} --routing --style=css --skip-install --defaults\`;
 
 copyFileSync(\`\${appName}.json\`, \`\${appName}/grapesjs-project.json\`);
@@ -75,7 +77,6 @@ const project = JSON.parse(readFileSync(\`\${appName}.json\`, 'utf-8'));
 
 for (const page of project.pages) {
   const nameKebab = page.name.toLowerCase().replace(/\\s+/g, '-');
-  console.log('🚀 Generando componente', nameKebab);
   await $\`cd \${appName} && bun x ng generate component pages/\${nameKebab} --flat=false --module=app.module.ts\`;
   
   writeFileSync(
@@ -126,7 +127,6 @@ export const routes = [
     routesFileContent,
     'utf-8'
   );
-  console.log('✅ app.routes.ts generado dinámicamente');
 })();
 
 // Sobreescribir app.component.html con <router-outlet> y menú
@@ -167,39 +167,15 @@ export class AppComponent {}
     appCompHtml,
     'utf-8'
   );
-  console.log('✅ app.component.html actualizado con <router-outlet>');
 })();
 
-// Instalar dependencias con Bun (mucho más rápido que npm)
-console.log('📦 bun install');
 await $\`cd \${appName} && bun install\`;
 
-console.log('🎉 ¡Todo listo! Ahora entra en ' + appName + ' y ejecuta:');
-console.log('    bun dev');
+console.log(\`✅ All ready. Make a:\n cd \${appName} and Then: bun start\`);
 `;
   
   // Cambiamos la extensión a .ts para TypeScript con Bun
   zip.file(`${projectName}.ts`, scriptContent, { unixPermissions: "755" });
-
-  const readme = `
-# Instrucciones de generación con Bun
-
-1. Descomprime este ZIP.
-2. Abre terminal en la carpeta resultante.
-3. Asegúrate de tener instalado Bun: \`curl -fsSL https://bun.sh/install | bash\`
-4. Ejecuta:
-   \`\`\`
-   bun run ${projectName}.ts
-   \`\`\`
-4. Entra en la carpeta creada:
-   \`\`\`
-   cd ${projectName}
-   bun dev
-   \`\`\`
-
-> **Requisitos**: Bun instalado y conexión a Internet.
-`;
-  zip.file("README.txt", readme.trim());
 
   const content = await zip.generateAsync({ type: "blob" });
   FileSaver.saveAs(content, `${projectName}.zip`);

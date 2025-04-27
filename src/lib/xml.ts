@@ -2,7 +2,7 @@ import JSZip from "jszip";
 import * as FileSaver from "file-saver";
 import { ParsedClass, ParseModelXml } from "./parce";
 
-export async function ExportXmlAngular(xmlFile: File, projectName = "diagram-project") {
+export async function ExportXmlAngular(xmlFile: File, projectName = "diagram") {
   if (!xmlFile) return;
 
   const xmlText = await xmlFile.text();
@@ -13,7 +13,7 @@ export async function ExportXmlAngular(xmlFile: File, projectName = "diagram-pro
   const zip = new JSZip();
   zip.file("model.json", JSON.stringify(clases, null, 2));
 
-  const script = `#!/usr/bin/env node
+  const script = `#!/usr/bin/env bun
 
 console.log(\`
 
@@ -23,7 +23,7 @@ console.log(\`
 
  \`);
 
-console.log('Generando recursos...');
+console.log('Generating resources, please wait ...');
 
 const { exec } = require("child_process");
 const fs = require("fs/promises");
@@ -42,7 +42,7 @@ const pascalCase = (str) =>
 const kebabCase = (str) => str.toLowerCase().replace(/[_\\s]+/g, "-");
 
 async function generateAngularProject(appName) {
-  await execCmd(\`npx @angular/cli@19 new \${appName} --routing --style=css --skip-install --defaults\`, { stdio: 'inherit' });
+  await execCmd(\`bunx @angular/cli@19 new \${appName} --routing --style=css --skip-install --defaults\`, { stdio: 'inherit' });
 }
 
 async function copyModelJson(appName) {
@@ -56,7 +56,7 @@ async function createComponent(appName, clase) {
   const className = pascalCase(clase.name) + "Component";
   const pageDir = path.join(appName, "src/app/pages", kebab);
 
-  await execCmd(\`npx ng generate component pages/\${kebab} --module=app.module.ts\`, { cwd: appName });
+  await execCmd(\`bunx ng generate component pages/\${kebab} --module=app.module.ts\`, { cwd: appName });
   await fs.mkdir(pageDir, { recursive: true });
 
   const ts = \`
@@ -323,9 +323,9 @@ async function main() {
   await updateAppComponent(appName, valid);
 
   await waitForFile(path.join(appName, "package.json"));
-  await execCmd("npm install", { cwd: appName });
+  await execCmd("bun install", { cwd: appName });
 
-console.log(\`✅ Todo Listo. Haz un:\ncd \${appName} && npm start\`);
+console.log(\`✅ All ready. Make a:\n cd \${appName} and Then: bun start\`);
   
 }
 
