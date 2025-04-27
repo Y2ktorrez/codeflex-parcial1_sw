@@ -1,12 +1,11 @@
 "use client";
 
 import { type Editor } from 'grapesjs';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import '@grapesjs/studio-sdk/style';
 import StudioEditorComponent from '@/components/StudioEditorComponent';
 import ExportButton from './components/GrapesFooter';
 import { ChatDrawer } from '@/components/ChatDrawer';
-import { useAuth } from '@/context/AuthContext';
 import { WebSocketProvider } from '@/context/WebSocketContext';
 
 export default function StudioEditorPage() {

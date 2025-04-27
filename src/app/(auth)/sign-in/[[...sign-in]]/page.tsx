@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,23 +8,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { loginUser } from "@/lib/auth";
+import axios from "axios";
+import { loginUser, LoginResponse } from "@/lib/auth";
 import { useAuth } from "@/context/AuthContext";
 
+interface ErrorResponse {
+  detail?: string;
+  message?: string;
+}
+
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { login } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
     try {
-      const response = await loginUser({ email, password });
+      const response: LoginResponse = await loginUser({ email, password });
 
       // Guardar tokens y usuario
       localStorage.setItem("access_token", response.token.access);
@@ -33,11 +39,16 @@ export default function LoginPage() {
 
       login(response.user, response.token.access, response.token.refresh);
       router.push("/");
-    } catch (err: any) {
-      const message =
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        "Login failed. Please check your credentials.";
+    } catch (error: unknown) {
+      let message = "Login failed. Please check your credentials.";
+
+      if (axios.isAxiosError(error) && error.response) {
+        const data = error.response.data as ErrorResponse;
+        message = data.detail ?? data.message ?? message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
       setError(message);
     }
   };

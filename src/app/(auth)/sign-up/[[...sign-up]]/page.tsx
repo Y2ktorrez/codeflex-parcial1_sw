@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,20 +8,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { registerUser } from "@/lib/auth";
 import { useAuth } from "@/context/AuthContext";
 
-export default function SignUpPage() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { login } = useAuth(); // ← Función login del contexto
+interface RegisterErrorResponse {
+  email?: string[];
+  username?: string[];
+  message?: string;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
+export default function SignUpPage() {
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const router = useRouter();
+  const { login } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -36,13 +44,21 @@ export default function SignUpPage() {
         "mock-refresh-token"
       );
 
-      router.push("/"); // Redirige al home o dashboard
-    } catch (err: any) {
-      const message =
-        err.response?.data?.email?.[0] ||
-        err.response?.data?.username?.[0] ||
-        err.response?.data?.message ||
-        "Registration failed. Please check your inputs.";
+      router.push("/");
+    } catch (error: unknown) {
+      let message = "Registration failed. Please check your inputs.";
+
+      if (axios.isAxiosError(error) && error.response) {
+        const data = error.response.data as RegisterErrorResponse;
+        message =
+          data.email?.[0] ??
+          data.username?.[0] ??
+          data.message ??
+          message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
       setError(message);
     } finally {
       setLoading(false);
@@ -70,7 +86,9 @@ export default function SignUpPage() {
         </div>
 
         {error && (
-          <div className="mb-4 text-sm text-red-500 text-center">{error}</div>
+          <div className="mb-4 text-sm text-red-500 text-center">
+            {error}
+          </div>
         )}
 
         <form className="space-y-6" onSubmit={handleSubmit}>
