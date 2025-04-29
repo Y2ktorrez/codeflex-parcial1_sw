@@ -13,7 +13,7 @@ import Link from "next/link";
 import { ZapIcon } from "lucide-react";
 import { ExportToAngular } from "@/app/grapesjs/utils/angular_export";
 
-export default function ExportButton({ editor }: { editor?: Editor }) {
+export default function ExportButtonSketch({ editor }: { editor?: Editor }) {
   const [projectName, setProjectName] = useState("codeflex-io");
   const [isOpen, setIsOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
