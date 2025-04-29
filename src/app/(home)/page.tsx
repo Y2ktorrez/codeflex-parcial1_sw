@@ -83,7 +83,7 @@ const HomePage = () => {
               {/* IMAGE CONTANINER */}
               <div className="relative aspect-square max-w-lg mx-auto">
                 <div className="relative overflow-hidden rounded-lg bg-cyber-black">
-                  <img
+                  <Image
                     src="/hero.png"
                     alt="AI Fitness Coach"
                     className="size-full object-cover object-center"
