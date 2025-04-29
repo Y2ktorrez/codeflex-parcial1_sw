@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 const HomePage = () => {
@@ -25,7 +26,7 @@ const HomePage = () => {
                 </div>
                 <div className="pt-2">
                   <span className="text-foreground">AI</span>
-                  <span className="text-primary"> Powered Design"</span>
+                  <span className="text-primary"> Powered Design</span>
                 </div>
               </h1>
 
@@ -82,7 +83,7 @@ const HomePage = () => {
               {/* IMAGE CONTANINER */}
               <div className="relative aspect-square max-w-lg mx-auto">
                 <div className="relative overflow-hidden rounded-lg bg-cyber-black">
-                  <img
+                  <Image
                     src="/hero.png"
                     alt="AI Fitness Coach"
                     className="size-full object-cover object-center"

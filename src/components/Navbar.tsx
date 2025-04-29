@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { EditIcon, CloudUploadIcon, ZapIcon, User2Icon } from "lucide-react";
+import { CloudUploadIcon, ZapIcon, User2Icon } from "lucide-react";
 import { Button } from "./ui/button";
 import { CreateProjectDialog } from "./ProjectDialog";
 import {
