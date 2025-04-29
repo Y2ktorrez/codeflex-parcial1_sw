@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
+import { CreateBocetpDialog } from "./bocetoDialog";
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -32,10 +33,7 @@ const Navbar = () => {
         <nav className="flex items-center gap-5">
           {isAuthenticated ? (
             <>
-              <Link href="/sketch" className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors">
-                <EditIcon size={16} />
-                <span>Sketch</span>
-              </Link>
+              <CreateBocetpDialog />
 
               <Link href="/diagram" className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors">
                 <CloudUploadIcon size={16} />

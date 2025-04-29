@@ -30,7 +30,7 @@ export default function StudioEditorComponent({ onReady }: StudioEditorComponent
       root: '#studio-editor',
       licenseKey:
         process.env.NEXT_PUBLIC_GRAPESJS_LICENSE_KEY ||
-        '9c946b9c9cd04013a9ee0bb712eed0b5e5fe1545d5234a4da8436a92df27987a',
+        'YOUR_GRAPESJS_LICENSE_KEY',
       theme: 'light',
       customTheme: {
         default: {
